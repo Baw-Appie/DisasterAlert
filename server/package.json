@@ -1,0 +1,16 @@
+{
+  "name": "disaster-alert-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "DisasterAlert Node.js backend server for Disaster Safety Data Platform sync and search API",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "lint": "echo \"ESLint check placeholder - configure in server implementation issue\"",
+    "test": "node --test tests/"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
