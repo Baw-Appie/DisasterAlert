@@ -1,23 +1,58 @@
-const http = require('node:http');
+import { fileURLToPath } from 'node:url';
+import { buildApp } from './app.js';
+import { loadServerConfig } from './config/env.config.js';
 
-const port = Number(process.env.PORT || 3000);
+export { buildApp } from './app.js';
+export { loadServerConfig } from './config/env.config.js';
 
-const server = http.createServer((req, res) => {
-  if (req.url === '/health' && req.method === 'GET') {
-    res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
-    res.end(JSON.stringify({ status: 'ok', service: 'disaster-alert-server' }));
-    return;
+export async function startServer(rawEnv = process.env) {
+  const config = loadServerConfig(rawEnv);
+  const app = await buildApp({
+    config,
+    logger: true,
+  });
+
+  if (!config.apns) {
+    app.log.warn(
+      'APNs credentials (APNS_TEAM_ID, APNS_KEY_ID, APNS_TOPIC, APNS_PRIVATE_KEY_PATH) are not configured; APNs delivery is inactive.',
+    );
   }
 
-  res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
-  res.end(JSON.stringify({ message: 'Not Found' }));
-});
+  let shuttingDown = false;
+  const shutdownGracefully = async (signal) => {
+    if (shuttingDown) {
+      return;
+    }
+    shuttingDown = true;
+    app.log.info({ signal }, 'Shutting down server');
+    try {
+      await app.close();
+      process.exit(0);
+    } catch (closeError) {
+      app.log.error(closeError, 'Error while closing server');
+      process.exit(1);
+    }
+  };
 
-if (require.main === module) {
-  server.listen(port, () => {
-    // eslint-disable-next-line no-console
-    console.log(`DisasterAlert server listening on http://localhost:${port}`);
-  });
+  process.on('SIGINT', () => shutdownGracefully('SIGINT'));
+  process.on('SIGTERM', () => shutdownGracefully('SIGTERM'));
+
+  try {
+    await app.listen({
+      host: config.host,
+      port: config.port,
+    });
+  } catch (listenError) {
+    app.log.error(listenError, 'Failed to start server');
+    process.exit(1);
+  }
+
+  return app;
 }
 
-module.exports = { server };
+const isExecutedDirectly =
+  process.argv[1] !== undefined && fileURLToPath(import.meta.url) === process.argv[1];
+
+if (isExecutedDirectly) {
+  startServer();
+}
