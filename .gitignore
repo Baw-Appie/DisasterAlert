@@ -5,6 +5,7 @@
 .env
 .env.*
 !.env.example
+*.p8
 
 # Node.js (server/)
 node_modules/
@@ -14,6 +15,10 @@ yarn-error.log*
 pnpm-debug.log*
 coverage/
 dist/
+server/data/
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
 
 # Xcode / iOS (ios/)
 DerivedData/

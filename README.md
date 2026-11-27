@@ -78,9 +78,16 @@
 ```bash
 git clone https://github.com/Baw-Appie/DisasterAlert.git
 cd DisasterAlert/server
-cp .env.example .env   # 재난안전데이터 공유 플랫폼 API 인증키 설정
+cp .env.example .env   # APNs(.p8), SQLite 경로, TEST_PUSH_API_KEY 등 환경 변수 설정
 npm install
 npm run dev
+```
+
+서버 린트 및 테스트 검증:
+```bash
+cd server
+npm run lint
+npm test
 ```
 
 ### 5.2 iOS 앱 실행 (`ios/`)

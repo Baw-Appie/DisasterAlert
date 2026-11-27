@@ -2,15 +2,28 @@
   "name": "disaster-alert-server",
   "version": "0.1.0",
   "private": true,
-  "description": "DisasterAlert Node.js backend server for Disaster Safety Data Platform sync and search API",
+  "description": "Fastify APNs device registration and push notification server for DisasterAlert",
+  "type": "module",
   "main": "src/index.js",
-  "scripts": {
-    "start": "node src/index.js",
-    "dev": "node --watch src/index.js",
-    "lint": "echo \"ESLint check placeholder - configure in server implementation issue\"",
-    "test": "node --test tests/"
-  },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.5.0"
+  },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning --env-file-if-exists=.env src/index.js",
+    "dev": "node --disable-warning=ExperimentalWarning --watch --env-file-if-exists=.env src/index.js",
+    "lint": "eslint --max-warnings=0 . && prettier --check .",
+    "format": "prettier --write .",
+    "test": "node --disable-warning=ExperimentalWarning --test tests/*.test.js"
+  },
+  "dependencies": {
+    "@fastify/rate-limit": "^10.2.2",
+    "fastify": "^5.2.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.21.0",
+    "eslint": "^9.21.0",
+    "eslint-config-prettier": "^10.0.2",
+    "globals": "^16.0.0",
+    "prettier": "^3.5.2"
   }
 }
